@@ -41,7 +41,7 @@ def open_meteo_api_data_reading(params):
     else:
         print(f"Request failed with status code {response.status_code}")
         return None
-
+    
 # Example usage
 params = {
     "latitude": 41.871968766034165,
