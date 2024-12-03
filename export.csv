@@ -1,5 +1,4 @@
-Table 1
-date,date,date,tmax,prcp,snow,wdir,wspd,wpgt,pres,tsun
+date,tavg,tmin,tmax,prcp,snow,wdir,wspd,wpgt,pres,tsun
 2015-01-01,-4.3,-8.3,0,0,0,240,25.5,,1019.8,
 2015-01-02,-1.5,-6.7,2.2,0,0,,7.8,,1025.3,
 2015-01-03,1.6,-0.6,2.8,15,0,,8.5,,1013.7,
