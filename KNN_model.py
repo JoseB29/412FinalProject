@@ -76,57 +76,104 @@ print('MSE:', mean_squared_error(y_test_prcp, y_pred_knn_prcp))
 print('MAE:', mean_absolute_error(y_test_prcp, y_pred_knn_prcp))
 print('R^2 Score:', r2_score(y_test_prcp, y_pred_knn_prcp))
 
-# Read and preprocess last month's data
-last_month_data = pd.read_csv('lastMonth.csv', na_values=['', ' ', 'NA', 'NaN'])
-last_month_data['date'] = pd.to_datetime(last_month_data['date'])
+# # Read and preprocess last month's data
+# last_month_data = pd.read_csv('lastMonth.csv', na_values=['', ' ', 'NA', 'NaN'])
+# last_month_data['date'] = pd.to_datetime(last_month_data['date'])
 
-# Recreate lagged features and rolling statistics for last_month_data
-last_month_data['tavg_lag1'] = last_month_data['tavg'].shift(1)
-last_month_data['prcp_lag1'] = last_month_data['prcp'].shift(1)
-last_month_data['tavg_roll_mean'] = last_month_data['tavg'].rolling(window=3).mean()
-last_month_data['prcp_roll_sum'] = last_month_data['prcp'].rolling(window=3).sum()
+# # Recreate lagged features and rolling statistics for last_month_data
+# last_month_data['tavg_lag1'] = last_month_data['tavg'].shift(1)
+# last_month_data['prcp_lag1'] = last_month_data['prcp'].shift(1)
+# last_month_data['tavg_roll_mean'] = last_month_data['tavg'].rolling(window=3).mean()
+# last_month_data['prcp_roll_sum'] = last_month_data['prcp'].rolling(window=3).sum()
 
-# Handle missing values in new features
-for feature in features:
-    last_month_data[feature] = pd.to_numeric(last_month_data[feature], errors='coerce')
-last_month_data[features] = last_month_data[features].fillna(last_month_data[features].mean())
+# # Handle missing values in new features
+# for feature in features:
+#     last_month_data[feature] = pd.to_numeric(last_month_data[feature], errors='coerce')
+# last_month_data[features] = last_month_data[features].fillna(last_month_data[features].mean())
 
-# Scale the features
-X_last = scaler.transform(last_month_data[features])
+# # Scale the features
+# X_last = scaler.transform(last_month_data[features])
 
-# Predict next day's values
-last_month_data['knn_tavg_pred'] = knn_tavg.predict(X_last)
-last_month_data['knn_prcp_pred'] = knn_prcp.predict(X_last)
+# # Predict next day's values
+# last_month_data['knn_tavg_pred'] = knn_tavg.predict(X_last)
+# last_month_data['knn_prcp_pred'] = knn_prcp.predict(X_last)
 
-# Create results DataFrame
-results = last_month_data[['date', 'knn_tavg_pred', 'knn_prcp_pred']]
+# # Create results DataFrame
+# results = last_month_data[['date', 'knn_tavg_pred', 'knn_prcp_pred']]
 
-# Write results to CSV
-results.to_csv('KNN_predictions.csv', index=False)
+# # Write results to CSV
+# results.to_csv('KNN_predictions.csv', index=False)
 
-# Plot the results with clean, smooth lines
-plt.figure(figsize=(14, 8))
+# # Plot the results with clean, smooth lines
+# plt.figure(figsize=(14, 8))
 
-# Subplot for Temperature
-plt.subplot(2, 1, 1)
-plt.plot(results['date'], last_month_data['tavg'], label='Actual Temperature', color='blue', linestyle='-')
-plt.plot(results['date'], results['knn_tavg_pred'], label='Predicted Temperature', color='orange', linestyle='--')
-plt.xlabel('Date')
-plt.ylabel('Average Temperature (°C)')
-plt.title('Actual vs Predicted Avg. Temperature (KNN Model)')
-plt.grid(visible=True, linestyle=':', linewidth=0.5)
-plt.legend()
+# # Subplot for Temperature
+# plt.subplot(2, 1, 1)
+# plt.plot(results['date'], last_month_data['tavg'], label='Actual Temperature', color='blue', linestyle='-')
+# plt.plot(results['date'], results['knn_tavg_pred'], label='Predicted Temperature', color='orange', linestyle='--')
+# plt.xlabel('Date')
+# plt.ylabel('Average Temperature (°C)')
+# plt.title('Actual vs Predicted Avg. Temperature (KNN Model)')
+# plt.grid(visible=True, linestyle=':', linewidth=0.5)
+# plt.legend()
 
-# Subplot for Precipitation
-plt.subplot(2, 1, 2)
-plt.plot(results['date'], last_month_data['prcp'], label='Actual Precipitation', color='blue', linestyle='-')
-plt.plot(results['date'], results['knn_prcp_pred'], label='Predicted Precipitation', color='orange', linestyle='--')
-plt.xlabel('Date')
-plt.ylabel('Precipitation (mm)')
-plt.title('Actual vs Predicted Precipitation (KNN Model)')
-plt.grid(visible=True, linestyle=':', linewidth=0.5)
-plt.legend()
+# # Subplot for Precipitation
+# plt.subplot(2, 1, 2)
+# plt.plot(results['date'], last_month_data['prcp'], label='Actual Precipitation', color='blue', linestyle='-')
+# plt.plot(results['date'], results['knn_prcp_pred'], label='Predicted Precipitation', color='orange', linestyle='--')
+# plt.xlabel('Date')
+# plt.ylabel('Precipitation (mm)')
+# plt.title('Actual vs Predicted Precipitation (KNN Model)')
+# plt.grid(visible=True, linestyle=':', linewidth=0.5)
+# plt.legend()
 
-# Adjust layout and display the plot
-plt.tight_layout()
-plt.show()
+# # Adjust layout and display the plot
+# plt.tight_layout()
+# plt.show()
+
+def apply_knn_model(input_data):
+    """
+    Predicts temperature and precipitation using the pre-trained models.
+
+    Parameters:
+    input_data (pd.DataFrame): The input data for prediction.
+
+    Returns:
+    pd.DataFrame: A DataFrame containing the predicted temperature and precipitation.
+    """
+    # Ensure input data has the same features as the training data
+    features = ['tavg', 'tmin', 'tmax', 'prcp', 'snow', 'wspd', 'pres', 'tavg_lag1', 'prcp_lag1', 'tavg_roll_mean', 'prcp_roll_sum']
+    
+    # Recreate lagged features and rolling statistics for input_data
+    input_data['tavg_lag1'] = input_data['tavg'].shift(1)
+    input_data['prcp_lag1'] = input_data['prcp'].shift(1)
+    input_data['tavg_roll_mean'] = input_data['tavg'].rolling(window=7).mean()
+    input_data['prcp_roll_sum'] = input_data['prcp'].rolling(window=3).sum()
+    
+    # Handle missing values in new features
+    input_data[features] = input_data[features].fillna(input_data[features].mean())
+
+    # Replace NaN values with 0
+    input_data.fillna(0, inplace=True)
+    
+    # Convert features to numeric
+    for feature in features:
+        input_data[feature] = pd.to_numeric(input_data[feature], errors='coerce')
+    
+    # Handle missing values in new features
+    input_data[features] = input_data[features].fillna(input_data[features].mean())
+    
+    # Scale the features
+    input_data = scaler.transform(input_data[features])
+    
+    # Make predictions
+    predicted_tavg = knn_tavg.predict(input_data)
+    predicted_prcp = knn_prcp.predict(input_data)
+    
+    # Create a DataFrame with the predictions
+    predictions = pd.DataFrame({
+        'Predicted Temperature': predicted_tavg,
+        'Predicted Precipitation': predicted_prcp
+    })
+    
+    return predictions
