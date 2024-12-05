@@ -58,49 +58,75 @@ mse_prcp = mean_squared_error(y_test_prcp, y_pred_prcp)
 print(f"Mean Squared Error for Average Temperature (tavg): {mse_tavg}")
 print(f"Mean Squared Error for Precipitation (prcp): {mse_prcp}")
 
-# Ensure matching columns between training and last month's data
-X_last_month = X_last_month.reindex(columns=X.columns, fill_value=0)
+# # Ensure matching columns between training and last month's data
+# X_last_month = X_last_month.reindex(columns=X.columns, fill_value=0)
 
-# Predict on the last month's data
-y_last_month_pred_tavg = ridge_tavg.predict(X_last_month)
-y_last_month_pred_prcp = ridge_prcp.predict(X_last_month)
+# # Predict on the last month's data
+# y_last_month_pred_tavg = ridge_tavg.predict(X_last_month)
+# y_last_month_pred_prcp = ridge_prcp.predict(X_last_month)
 
-# Set negative values for precipitation predictions to zero
-y_last_month_pred_prcp = np.maximum(y_last_month_pred_prcp, 0)
+# # Set negative values for precipitation predictions to zero
+# y_last_month_pred_prcp = np.maximum(y_last_month_pred_prcp, 0)
 
-# Add predictions as new columns to the last month's data
-lastMonthData['Predicted_Tavg'] = y_last_month_pred_tavg
-lastMonthData['Predicted_Prcp'] = y_last_month_pred_prcp
+# # Add predictions as new columns to the last month's data
+# lastMonthData['Predicted_Tavg'] = y_last_month_pred_tavg
+# lastMonthData['Predicted_Prcp'] = y_last_month_pred_prcp
 
-# Plotting the results for tavg (average temperature)
-plt.figure(figsize=(12, 6))
+# # Plotting the results for tavg (average temperature)
+# plt.figure(figsize=(12, 6))
 
-# Plot the actual vs predicted temperature for the test set
-plt.subplot(1, 2, 1)
-plt.scatter(y_test_tavg, y_pred_tavg, color='blue', label='Predicted vs Actual')
-plt.plot([min(y_test_tavg), max(y_test_tavg)], [min(y_test_tavg), max(y_test_tavg)], color='red', linestyle='--')
-plt.title('Tavg (Temperature) - Actual vs Predicted')
-plt.xlabel('Actual Temperature (°C)')
-plt.ylabel('Predicted Temperature (°C)')
-plt.legend()
+# # Plot the actual vs predicted temperature for the test set
+# plt.subplot(1, 2, 1)
+# plt.scatter(y_test_tavg, y_pred_tavg, color='blue', label='Predicted vs Actual')
+# plt.plot([min(y_test_tavg), max(y_test_tavg)], [min(y_test_tavg), max(y_test_tavg)], color='red', linestyle='--')
+# plt.title('Tavg (Temperature) - Actual vs Predicted')
+# plt.xlabel('Actual Temperature (°C)')
+# plt.ylabel('Predicted Temperature (°C)')
+# plt.legend()
 
-# Plot the actual vs predicted precipitation for the test set
-plt.subplot(1, 2, 2)
-plt.scatter(y_test_prcp, y_pred_prcp, color='blue', label='Predicted vs Actual')
-plt.plot([min(y_test_prcp), max(y_test_prcp)], [min(y_test_prcp), max(y_test_prcp)], color='red', linestyle='--')
-plt.title('Prcp (Precipitation) - Actual vs Predicted')
-plt.xlabel('Actual Precipitation (mm)')
-plt.ylabel('Predicted Precipitation (mm)')
-plt.legend()
+# # Plot the actual vs predicted precipitation for the test set
+# plt.subplot(1, 2, 2)
+# plt.scatter(y_test_prcp, y_pred_prcp, color='blue', label='Predicted vs Actual')
+# plt.plot([min(y_test_prcp), max(y_test_prcp)], [min(y_test_prcp), max(y_test_prcp)], color='red', linestyle='--')
+# plt.title('Prcp (Precipitation) - Actual vs Predicted')
+# plt.xlabel('Actual Precipitation (mm)')
+# plt.ylabel('Predicted Precipitation (mm)')
+# plt.legend()
 
-plt.tight_layout()
-plt.show()
+# plt.tight_layout()
+# plt.show()
 
-# Check if actual values exist in the last month's data
-if 'tavg' in lastMonthData.columns and 'prcp' in lastMonthData.columns:
-    # Print the actual and predicted values
-    print("\nOct. 17 2024 - Nov. 17 2024 Data with Actual and Predicted Values for tavg and prcp:")
-    print(lastMonthData[['tavg', 'prcp', 'Predicted_Tavg', 'Predicted_Prcp']])
-else:
-    print("\nActual values for tavg and prcp are not available in lastMonthData. Showing predictions only:")
-    print(lastMonthData[['Predicted_Tavg', 'Predicted_Prcp']])
+# # Check if actual values exist in the last month's data
+# if 'tavg' in lastMonthData.columns and 'prcp' in lastMonthData.columns:
+#     # Print the actual and predicted values
+#     print("\nOct. 17 2024 - Nov. 17 2024 Data with Actual and Predicted Values for tavg and prcp:")
+#     print(lastMonthData[['tavg', 'prcp', 'Predicted_Tavg', 'Predicted_Prcp']])
+# else:
+#     print("\nActual values for tavg and prcp are not available in lastMonthData. Showing predictions only:")
+#     print(lastMonthData[['Predicted_Tavg', 'Predicted_Prcp']])
+
+def apply_rr_model(input_data):
+    """
+    Predicts temperature and precipitation using the pre-trained models.
+
+    Parameters:
+    input_data (pd.DataFrame): The input data for prediction.
+
+    Returns:
+    pd.DataFrame: A DataFrame containing the predicted temperature and precipitation.
+    """
+    # Ensure input data has the same features as the training data
+    features = ['tmin', 'tmax', 'snow', 'wspd', 'pres']
+    input_data = input_data[features]
+    
+    # Make predictions
+    predicted_tavg = ridge_tavg.predict(input_data)
+    predicted_prcp = ridge_prcp.predict(input_data)
+    
+    # Create a DataFrame with the predictions
+    predictions = pd.DataFrame({
+        'Predicted Temperature': predicted_tavg,
+        'Predicted Precipitation': predicted_prcp
+    })
+    
+    return predictions

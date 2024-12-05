@@ -112,96 +112,162 @@ print('MSE:', mse_rf_prcp)
 print('MAE:', mae_rf_prcp)
 print('R^2 Score:', r2_rf_prcp)
 
-# Define parameter grid for hyperparameter tuning of Random Forest
-param_grid = {
-    'n_estimators': [50, 100, 200],     # Number of trees
-    'max_depth': [None, 10, 20],        # Maximum depth of trees
-    'min_samples_split': [2, 5],        # Minimum number of samples required to split
-}
+# # Define parameter grid for hyperparameter tuning of Random Forest
+# param_grid = {
+#     'n_estimators': [50, 100, 200],     # Number of trees
+#     'max_depth': [None, 10, 20],        # Maximum depth of trees
+#     'min_samples_split': [2, 5],        # Minimum number of samples required to split
+# }
 
-# Read last month's weather data from 'lastMonth.csv' with proper NaN handling
-last_month_data = pd.read_csv('lastMonth.csv', na_values=['', ' ', 'NA', 'NaN'])
+# # Read last month's weather data from 'lastMonth.csv' with proper NaN handling
+# last_month_data = pd.read_csv('lastMonth.csv', na_values=['', ' ', 'NA', 'NaN'])
 
-# Convert 'date' column to datetime type
-last_month_data['date'] = pd.to_datetime(last_month_data['date'])
+# # Convert 'date' column to datetime type
+# last_month_data['date'] = pd.to_datetime(last_month_data['date'])
 
-# Convert features to numeric data types and coerce errors to NaN
-for feature in features:
-    last_month_data[feature] = pd.to_numeric(last_month_data[feature], errors='coerce')
+# # Convert features to numeric data types and coerce errors to NaN
+# for feature in features:
+#     last_month_data[feature] = pd.to_numeric(last_month_data[feature], errors='coerce')
 
-# Check the number of missing values in each feature
-print("\nNumber of missing values in last_month_data before filling:")
-print(last_month_data[features].isna().sum())
+# # Check the number of missing values in each feature
+# print("\nNumber of missing values in last_month_data before filling:")
+# print(last_month_data[features].isna().sum())
 
-# Fill missing values in last month's data
-last_month_data[features] = last_month_data[features].fillna(last_month_data[features].mean())
+# # Fill missing values in last month's data
+# last_month_data[features] = last_month_data[features].fillna(last_month_data[features].mean())
 
-# Create actual next day's 'tavg' and 'prcp' in last month's data by shifting
-last_month_data['tavg_next_day'] = last_month_data['tavg'].shift(-1)
-last_month_data['prcp_next_day'] = last_month_data['prcp'].shift(-1)
+# # Create actual next day's 'tavg' and 'prcp' in last month's data by shifting
+# last_month_data['tavg_next_day'] = last_month_data['tavg'].shift(-1)
+# last_month_data['prcp_next_day'] = last_month_data['prcp'].shift(-1)
 
-# Feature matrix for last month's data
-X_last = last_month_data[features]
+# # Feature matrix for last month's data
+# X_last = last_month_data[features]
 
-# Predict next day's average temperature using the linear regression model
-last_month_data['lr_tavg_pred'] = lr_model_tavg.predict(X_last)
+# # Predict next day's average temperature using the linear regression model
+# last_month_data['lr_tavg_pred'] = lr_model_tavg.predict(X_last)
 
-# Predict next day's precipitation using the linear regression model
-last_month_data['lr_prcp_pred'] = lr_model_prcp.predict(X_last)
+# # Predict next day's precipitation using the linear regression model
+# last_month_data['lr_prcp_pred'] = lr_model_prcp.predict(X_last)
 
-# Predict next day's average temperature using the rain forest model
-last_month_data['rf_tavg_pred'] = rf_model_tavg.predict(X_last)
+# # Predict next day's average temperature using the rain forest model
+# last_month_data['rf_tavg_pred'] = rf_model_tavg.predict(X_last)
 
-# Predict next day's precipitation using the rain forest model
-last_month_data['rf_prcp_pred'] = rf_model_prcp.predict(X_last)
+# # Predict next day's precipitation using the rain forest model
+# last_month_data['rf_prcp_pred'] = rf_model_prcp.predict(X_last)
 
-# Create a new DataFrame with predictions and actual values
-results = last_month_data[['date', 'tavg_next_day', 'lr_tavg_pred', 'rf_tavg_pred', 'prcp_next_day', 'lr_prcp_pred', 'rf_prcp_pred']]
+# # Create a new DataFrame with predictions and actual values
+# results = last_month_data[['date', 'tavg_next_day', 'lr_tavg_pred', 'rf_tavg_pred', 'prcp_next_day', 'lr_prcp_pred', 'rf_prcp_pred']]
 
-# Drop rows with NaN values
-results.dropna(subset=['tavg_next_day', 'prcp_next_day'], inplace=True)
+# # Drop rows with NaN values
+# results.dropna(subset=['tavg_next_day', 'prcp_next_day'], inplace=True)
 
-# Write the results to a new CSV file 'predictions.csv'
-results.to_csv('LR_and_RF_predictions.csv', index=False)
+# # Write the results to a new CSV file 'predictions.csv'
+# results.to_csv('LR_and_RF_predictions.csv', index=False)
 
-# Plot the actual and predicted average temperature
-plt.figure(figsize=(14, 7))
+# # Plot the actual and predicted average temperature
+# plt.figure(figsize=(14, 7))
 
-plt.subplot(2, 1, 1)
-plt.plot(results['date'], results['tavg_next_day'], label='Actual Temperature', color='black')
-plt.plot(results['date'], results['lr_tavg_pred'], label='Linear Regression Prediction', color='blue')
-plt.xlabel('Date')
-plt.ylabel('Average Temperature')
-plt.title('Actual vs Predicted Avg. Temperature')
-plt.legend()
+# plt.subplot(2, 1, 1)
+# plt.plot(results['date'], results['tavg_next_day'], label='Actual Temperature', color='black')
+# plt.plot(results['date'], results['lr_tavg_pred'], label='Linear Regression Prediction', color='blue')
+# plt.xlabel('Date')
+# plt.ylabel('Average Temperature')
+# plt.title('Actual vs Predicted Avg. Temperature')
+# plt.legend()
 
-plt.subplot(2, 1, 2)
-plt.plot(results['date'], results['prcp_next_day'], label='Actual Precipitation', color='black')
-plt.plot(results['date'], results['lr_prcp_pred'], label='Linear Regression Prediction', color='blue')
-plt.xlabel('Date')
-plt.ylabel('Precipitation')
-plt.title('Actual vs Predicted Precipitation')
-plt.legend()
+# plt.subplot(2, 1, 2)
+# plt.plot(results['date'], results['prcp_next_day'], label='Actual Precipitation', color='black')
+# plt.plot(results['date'], results['lr_prcp_pred'], label='Linear Regression Prediction', color='blue')
+# plt.xlabel('Date')
+# plt.ylabel('Precipitation')
+# plt.title('Actual vs Predicted Precipitation')
+# plt.legend()
 
 
-# Plot the actual and predicted precipitation
-plt.figure(figsize=(14, 7))
-plt.subplot(2, 1, 1)
-plt.plot(results['date'], results['tavg_next_day'], label='Actual Temperature', color='black')
-plt.plot(results['date'], results['rf_tavg_pred'], label='Random Forest Prediction', color='green')
-plt.xlabel('Date')
-plt.ylabel('Average Temperature')
-plt.title('Actual vs Predicted Avg. Temperature')
-plt.legend()
+# # Plot the actual and predicted precipitation
+# plt.figure(figsize=(14, 7))
+# plt.subplot(2, 1, 1)
+# plt.plot(results['date'], results['tavg_next_day'], label='Actual Temperature', color='black')
+# plt.plot(results['date'], results['rf_tavg_pred'], label='Random Forest Prediction', color='green')
+# plt.xlabel('Date')
+# plt.ylabel('Average Temperature')
+# plt.title('Actual vs Predicted Avg. Temperature')
+# plt.legend()
 
-# Plot the actual and predicted precipitation
-plt.subplot(2, 1, 2)
-plt.plot(results['date'], results['prcp_next_day'], label='Actual Precipitation', color='black')
-plt.plot(results['date'], results['rf_prcp_pred'], label='Random Forest Prediction', color='green')
-plt.xlabel('Date')
-plt.ylabel('Precipitation')
-plt.title('Actual vs Predicted Precipitation')
-plt.legend()
+# # Plot the actual and predicted precipitation
+# plt.subplot(2, 1, 2)
+# plt.plot(results['date'], results['prcp_next_day'], label='Actual Precipitation', color='black')
+# plt.plot(results['date'], results['rf_prcp_pred'], label='Random Forest Prediction', color='green')
+# plt.xlabel('Date')
+# plt.ylabel('Precipitation')
+# plt.title('Actual vs Predicted Precipitation')
+# plt.legend()
 
-plt.tight_layout()
-plt.show()
+# plt.tight_layout()
+# plt.show()
+
+def apply_linear_regression_model(input_data):
+    """
+    Apply the linear regression models to the input data and return the predictions.
+
+    Parameters:
+    input_data (pd.DataFrame): The input data to predict on.
+
+    Returns:
+    pd.DataFrame: The predictions made by the models.
+    """
+    # Ensure input data has the same features as the training data
+    features = ['tavg', 'tmin', 'tmax', 'prcp', 'snow', 'wspd', 'pres']
+    input_data = input_data[features]
+
+    # Convert features to numeric data types and coerce errors to NaN
+    for feature in features:
+        input_data[feature] = pd.to_numeric(input_data[feature], errors='coerce')
+
+    # Fill missing values in features with the mean of each column
+    input_data = input_data.fillna(input_data.mean())
+
+    # Predict using the linear regression models
+    tavg_predictions = lr_model_tavg.predict(input_data)
+    prcp_predictions = lr_model_prcp.predict(input_data)
+
+    # Create a DataFrame with the predictions
+    predictions = pd.DataFrame({
+        'Predicted Temperature': tavg_predictions,
+        'Predicted Precipitation': prcp_predictions
+    })
+
+    return predictions
+
+def apply_random_forest_model(input_data):
+    """
+    Apply the random forest models to the input data and return the predictions.
+
+    Parameters:
+    input_data (pd.DataFrame): The input data to predict on.
+
+    Returns:
+    pd.DataFrame: The predictions made by the models.
+    """
+    # Ensure input data has the same features as the training data
+    features = ['tavg', 'tmin', 'tmax', 'prcp', 'snow', 'wspd', 'pres']
+    input_data = input_data[features]
+
+    # Convert features to numeric data types and coerce errors to NaN
+    for feature in features:
+        input_data[feature] = pd.to_numeric(input_data[feature], errors='coerce')
+
+    # Fill missing values in features with the mean of each column
+    input_data = input_data.fillna(input_data.mean())
+
+    # Predict using the random forest models
+    tavg_predictions = rf_model_tavg.predict(input_data)
+    prcp_predictions = rf_model_prcp.predict(input_data)
+
+    # Create a DataFrame with the predictions
+    predictions = pd.DataFrame({
+        'Predicted Temperature': tavg_predictions,
+        'Predicted Precipitation': prcp_predictions
+    })
+
+    return predictions

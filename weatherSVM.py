@@ -14,8 +14,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import matplotlib.pyplot as plt
 
 # Load datasets
-data = pd.read_csv('/Users/zachetzkorn/Downloads/export.csv')
-lastMonth = pd.read_csv('/Users/zachetzkorn/Downloads/lastMonth.csv')
+data = pd.read_csv('export.csv')
+lastMonth = pd.read_csv('lastMonth.csv')
 
 # Remove unnecessary columns
 data.drop(columns=['wpgt', 'tsun', 'date'], inplace=True)
@@ -108,95 +108,120 @@ print(f"MAE: {prcp_mae}")
 print(f"R^2: {prcp_r2}")
 
 
-# In[12]:
+# # In[12]:
 
 
-dates_last_month = lastMonth['date']
+# dates_last_month = lastMonth['date']
 
-X_last_month = lastMonth.drop(columns=['tavg', 'prcp', 'date'])
-y_last_month_tavg = lastMonth['tavg']
-y_last_month_prcp = lastMonth['prcp']
+# X_last_month = lastMonth.drop(columns=['tavg', 'prcp', 'date'])
+# y_last_month_tavg = lastMonth['tavg']
+# y_last_month_prcp = lastMonth['prcp']
 
-# Scale the data using the already fitted scalers
-X_last_month_scaled_tavg = scaler_tavg.transform(X_last_month)
-X_last_month_scaled_prcp = scaler_prcp.transform(X_last_month)
+# # Scale the data using the already fitted scalers
+# X_last_month_scaled_tavg = scaler_tavg.transform(X_last_month)
+# X_last_month_scaled_prcp = scaler_prcp.transform(X_last_month)
 
-y_pred_last_month_tavg = svr_tavg.predict(X_last_month_scaled_tavg)
-y_pred_last_month_prcp = svr_prcp.predict(X_last_month_scaled_prcp)
+# y_pred_last_month_tavg = svr_tavg.predict(X_last_month_scaled_tavg)
+# y_pred_last_month_prcp = svr_prcp.predict(X_last_month_scaled_prcp)
 
-# Create results DataFrame for last month's predictions
-results_last_month = pd.DataFrame({
-    'Date': dates_last_month,
-    'Actual_TAVG': y_last_month_tavg,
-    'Predicted_TAVG': y_pred_last_month_tavg,
-    'Actual_PRCP': y_last_month_prcp,
-    'Predicted_PRCP': y_pred_last_month_prcp
-})
+# # Create results DataFrame for last month's predictions
+# results_last_month = pd.DataFrame({
+#     'Date': dates_last_month,
+#     'Actual_TAVG': y_last_month_tavg,
+#     'Predicted_TAVG': y_pred_last_month_tavg,
+#     'Actual_PRCP': y_last_month_prcp,
+#     'Predicted_PRCP': y_pred_last_month_prcp
+# })
 
-# Save results for last month
-results_last_month.to_csv('predicted_vs_actual_last_month.csv', index=False)
+# # Save results for last month
+# results_last_month.to_csv('predicted_vs_actual_last_month.csv', index=False)
 
-print("Results for last month saved to 'predicted_vs_actual_last_month.csv'.")
-print(results_last_month.head())
-
-
-# ## Model Performance Visualizations 
-
-# In[118]:
-
-# Plot Predicted vs Actual for 'tavg'
-plt.figure(figsize=(10, 5))
-plt.scatter(y_test_tavg, y_pred_tavg, alpha=0.5, color='blue', label='tavg Predictions')
-plt.plot([min(y_test_tavg), max(y_test_tavg)], [min(y_test_tavg), max(y_test_tavg)], color='red', linestyle='--')
-plt.xlabel("Actual TAVG")
-plt.ylabel("Predicted TAVG")
-plt.title("Predicted vs Actual TAVG")
-plt.legend()
-plt.show()
-
-# Plot Predicted vs Actual for 'prcp'
-plt.figure(figsize=(10, 5))
-plt.scatter(y_test_prcp, y_pred_prcp, alpha=0.5, color='green', label='prcp Predictions')
-plt.plot([min(y_test_prcp), max(y_test_prcp)], [min(y_test_prcp), max(y_test_prcp)], color='red', linestyle='--')
-plt.xlabel("Actual PRCP")
-plt.ylabel("Predicted PRCP")
-plt.title("Predicted vs Actual PRCP")
-plt.legend()
-plt.show()
+# print("Results for last month saved to 'predicted_vs_actual_last_month.csv'.")
+# print(results_last_month.head())
 
 
-# In[119]:
+# # ## Model Performance Visualizations 
+
+# # In[118]:
+
+# # Plot Predicted vs Actual for 'tavg'
+# plt.figure(figsize=(10, 5))
+# plt.scatter(y_test_tavg, y_pred_tavg, alpha=0.5, color='blue', label='tavg Predictions')
+# plt.plot([min(y_test_tavg), max(y_test_tavg)], [min(y_test_tavg), max(y_test_tavg)], color='red', linestyle='--')
+# plt.xlabel("Actual TAVG")
+# plt.ylabel("Predicted TAVG")
+# plt.title("Predicted vs Actual TAVG")
+# plt.legend()
+# plt.show()
+
+# # Plot Predicted vs Actual for 'prcp'
+# plt.figure(figsize=(10, 5))
+# plt.scatter(y_test_prcp, y_pred_prcp, alpha=0.5, color='green', label='prcp Predictions')
+# plt.plot([min(y_test_prcp), max(y_test_prcp)], [min(y_test_prcp), max(y_test_prcp)], color='red', linestyle='--')
+# plt.xlabel("Actual PRCP")
+# plt.ylabel("Predicted PRCP")
+# plt.title("Predicted vs Actual PRCP")
+# plt.legend()
+# plt.show()
 
 
-# Residual plot for 'tavg'
-residuals_tavg = y_test_tavg - y_pred_tavg
-plt.figure(figsize=(10, 5))
-plt.scatter(y_pred_tavg, residuals_tavg, alpha=0.5, color='blue')
-plt.axhline(y=0, color='red', linestyle='--')
-plt.xlabel("Predicted TAVG")
-plt.ylabel("Residuals")
-plt.title("Residuals for TAVG Predictions")
-plt.show()
-
-# Residual plot for 'prcp'
-residuals_prcp = y_test_prcp - y_pred_prcp
-plt.figure(figsize=(10, 5))
-plt.scatter(y_pred_prcp, residuals_prcp, alpha=0.5, color='green')
-plt.axhline(y=0, color='red', linestyle='--')
-plt.xlabel("Predicted PRCP")
-plt.ylabel("Residuals")
-plt.title("Residuals for PRCP Predictions")
-plt.show()
+# # In[119]:
 
 
-# In[3]:
+# # Residual plot for 'tavg'
+# residuals_tavg = y_test_tavg - y_pred_tavg
+# plt.figure(figsize=(10, 5))
+# plt.scatter(y_pred_tavg, residuals_tavg, alpha=0.5, color='blue')
+# plt.axhline(y=0, color='red', linestyle='--')
+# plt.xlabel("Predicted TAVG")
+# plt.ylabel("Residuals")
+# plt.title("Residuals for TAVG Predictions")
+# plt.show()
+
+# # Residual plot for 'prcp'
+# residuals_prcp = y_test_prcp - y_pred_prcp
+# plt.figure(figsize=(10, 5))
+# plt.scatter(y_pred_prcp, residuals_prcp, alpha=0.5, color='green')
+# plt.axhline(y=0, color='red', linestyle='--')
+# plt.xlabel("Predicted PRCP")
+# plt.ylabel("Residuals")
+# plt.title("Residuals for PRCP Predictions")
+# plt.show()
 
 
-
-
-
-# In[ ]:
+# # In[3]:
 
 
 
 
+
+# # In[ ]:
+
+
+
+
+def apply_svm_model(input_data):
+    """
+    Predicts temperature and precipitation using the pre-trained models.
+
+    Parameters:
+    input_data (pd.DataFrame): The input data for prediction.
+
+    Returns:
+    pd.DataFrame: A DataFrame containing the predicted temperature and precipitation.
+    """
+    # Ensure input data has the same features as the training data
+    features = ['tmin', 'tmax', 'snow', 'wspd', 'pres', 'wdir']
+    input_data = input_data[features]
+    
+    # Make predictions
+    predicted_tavg = svr_tavg.predict(input_data)
+    predicted_prcp = svr_prcp.predict(input_data)
+    
+    # Create a DataFrame with the predictions
+    predictions = pd.DataFrame({
+        'Predicted Temperature': predicted_tavg,
+        'Predicted Precipitation': predicted_prcp
+    })
+    
+    return predictions
